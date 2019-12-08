@@ -1,0 +1,29 @@
+Vagrant.configure("2") do |config|
+    config.vm.define "ansible_master" do | ansible_master|
+        ansible_master.vm.provision "shell", path: "master_script.sh"
+        ansible_master.vm.box = "ubuntu/xenial64"
+        ansible_master.vm.hostname = "ansiblemaster"
+        ansible_master.vm.network :private_network, ip: "172.17.0.2"
+        ansible_master.vm.provider "virtualbox" do |vb|
+          vb.memory = 256
+          vb.cpus = 1
+        end
+
+    end
+end
+
+Vagrant.configure("2") do |config1|
+# increase the number if you need more
+    (1..1).each do |i|
+        config1.vm.define "ansible_node#{i}" do |node|
+            node.vm.provision "shell", path: "slave_script.sh"
+            node.vm.hostname = "ansibleworker#{i}"
+            node.vm.box = "ubuntu/xenial64"
+            node.vm.network :private_network, ip: "172.17.0.#{5+i}"
+            node.vm.provider "virtualbox" do |vb1|
+                vb1.memory = 256
+                vb1.cpus = 256
+            end
+        end
+    end
+end
